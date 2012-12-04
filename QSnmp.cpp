@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "QSnmp.hpp"
-#include <net-snmp/library/oid.h>
 
 QSnmp::QSnmp(const QString &peername, const QByteArray &community) {
 	init_snmp("door_control");
@@ -38,11 +37,9 @@ QVariant QSnmp::get(const QString &oid) {
 	snmp_add_null_var(pdu, anOID, anOID_len);
 	status = snmp_synch_response(ss, pdu, &response);
 
-//	snmp_free_pdu(pdu);
-
 	if (status != STAT_SUCCESS || response->errstat != SNMP_ERR_NOERROR) {
 		qDebug("QSnmp: failed to get an oid");
-//		snmp_free_pdu(response);
+		if (response) snmp_free_pdu(response);
 		return QVariant();
 	}
 
@@ -51,17 +48,19 @@ QVariant QSnmp::get(const QString &oid) {
 			// string
 			QByteArray res(vars->val_len, '\0');
 			memcpy(res.data(), vars->val.string, vars->val_len);
-//			snmp_free_pdu(response);
+			snmp_free_pdu(response);
 			return res;
 		}
 		if (vars->type == ASN_INTEGER) {
-			return (int)*vars->val.integer;
+			int res = (int)*vars->val.integer;
+			snmp_free_pdu(response);
+			return res;
 		}
 		print_variable(vars->name, vars->name_length, vars);
 		qDebug("QSnmp: unknown var type %d", vars->type);
 	}
 
-//	snmp_free_pdu(response);
+	snmp_free_pdu(response);
 	return QVariant();
 }
 

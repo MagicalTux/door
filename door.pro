@@ -4,9 +4,9 @@
 
 TEMPLATE = app
 TARGET = 
-DEPENDPATH += . c
+DEPENDPATH += .
 INCLUDEPATH += .
-LIBS = -lnetsnmpagent
+LIBS = -lnetsnmpagent -lnetsnmphelpers
 QT += network
 QT -= gui
 
