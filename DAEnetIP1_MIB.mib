@@ -1,0 +1,1305 @@
+DenkoviMIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY
+		        FROM SNMPv2-SMI
+		enterprises, NetworkAddress, IpAddress, Counter, Gauge
+			FROM RFC1155-SMI
+		OBJECT-TYPE
+                	FROM RFC-1212
+		TRAP-TYPE
+	                FROM RFC-1215;
+
+
+	MacAddress ::= OCTET STRING (SIZE (6))	-- a 6 octet address
+						-- in the
+						-- "canonical"
+						-- order
+
+DigitalS	MODULE-IDENTITY
+		LAST-UPDATED    "0202090000Z" -- February 02, 2009
+	        ORGANIZATION    " Denkovi Assembly Electronics Ltd."
+		CONTACT-INFO	
+				" b_denkov@abv.bg "
+		DESCRIPTION
+			        " This is a header for the Denkovi Assebly Electronics ltd  enterprise MIB.  All objects appear
+			         elsewhere. For software version 1.2.08."
+	
+		::= {enterprises 32111}			 
+
+
+--	.1.3.6.1.4.1.32111.1.2.3.2.0						
+
+DAEnetIP1 		OBJECT IDENTIFIER ::= { DigitalS 1}
+DI-09H 		OBJECT IDENTIFIER ::= { DigitalS 2}
+DI-09HM		OBJECT IDENTIFIER ::= { DigitalS 3}
+
+
+-- .1.3.6.1.4.1.32111.1.1.X.port
+
+	
+		
+
+P6pinEntry	OBJECT-TYPE
+		SYNTAX SEQUENCE OF P6pinEntry
+		ACCESS	not-accessible
+		STATUS      mandatory
+                DESCRIPTION
+			"P6pinEntry"
+		::= { DAEnetIP1 1}	
+
+		P6pinEntry::= 
+		SEQUENCE {
+			p6lock  INTEGER { High(1), Low(0) },
+			p6state INTEGER { High(1), Low(0) },
+			p6delay INTEGER {0..255},
+			p6description STRING (0..14)
+		}
+
+	p6lock OBJECT-TYPE
+		SYNTAX INTEGER { High(1), Low(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"High/Low lock"
+		::= { P6pinEntry 1 }	
+
+	p6state OBJECT-TYPE
+		SYNTAX INTEGER { High(1), Low(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"High/Low state"
+		::= { P6pinEntry 2 }
+
+	p6delay OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"Delay"
+		::= { P6pinEntry 3 }	
+	p6description OBJECT-TYPE
+		SYNTAX 	STRING (0..14)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Description"
+		::= { P6pinEntry 4 }	
+
+
+pings OBJECT-TYPE
+	SYNTAX      pings
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"A list of available pings options."
+	::= {  DAEnetIP1 2 }
+
+TXpingsEntry	OBJECT-TYPE
+		SYNTAX SEQUENCE OF TXpingsEntry
+		ACCESS	not-accessible
+		STATUS      mandatory
+                DESCRIPTION
+			"TXpingsEntry"
+		::= { pings 1}	
+
+		TXpingsEntry::= 
+		SEQUENCE {
+			txFreq  INTEGER (0..255),
+			txIP    IpAddress,
+			txAP 	INTEGER (0..255),
+			txMax   INTEGER (0..255),
+			txAction   INTEGER (0..255),
+			txMaxLen   INTEGER (64..1400),	
+			txStatus	INTEGER {Blocked(0), InService(1), Disabled(2)},
+			txLost	INTEGER (0..255),
+			txCount INTEGER (0..255),
+			txDelay INTEGER (0..255),
+			txAPrelay	INTEGER (0..255),
+			txSwitchRestart	INTEGER (0..3),
+			txAPjp2	INTEGER (0..255)
+
+		}
+
+	txFreq   OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"TX ping frequency"
+		::= { TXpingsEntry 1 }	
+	txIP   OBJECT-TYPE
+		SYNTAX 		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"TX IP address"
+		::= { TXpingsEntry 2 }
+	txAP  OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"TX Affected pins in decimal"
+		::= { TXpingsEntry 3 }	
+	txMAX  OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"Maximum reply lost before action to be taken"
+		::= { TXpingsEntry 4 }	
+		
+	txAction  OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"Maximum MAX counts before the service become in BLOCKED state"
+		::= { TXpingsEntry 5 }	
+	txMaxLen  OBJECT-TYPE
+		SYNTAX INTEGER (0..1400)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"IP packet len"
+		::= { TXpingsEntry 6 }	
+	txStatus  OBJECT-TYPE
+		SYNTAX INTEGER {Blocked(0), InService(1), Disabled(2)}
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			"An actual status of the txPing functionality"
+		::= { TXpingsEntry 7 }	
+	txLost  OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			"Number of seconds non-received ICMP ECHO REPLY packets"
+		::= { TXpingsEntry 8 }	
+	txCount  OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			"Number of actions taken after txFreq is reached"
+		::= { TXpingsEntry 9 }
+	txDelay  OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			"ICMP ping  Delay"
+		::= { TXpingsEntry 10 }	
+	txAPrelay  OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"TX Affected RELAY pins in decimal"
+		::= { TXpingsEntry 11 }	
+	SwitchRestart  OBJECT-TYPE
+		SYNTAX INTEGER (0..3)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"Switch restart when TX/RX ICMP action occurs
+			0 - No restart
+			1 - Restart attached DI-XX switch if TX action occurs
+			2 - Restart attached DI-XX switch if RX action occurs
+			3 - Restart attached DI-XX switch if RX or TX action occurs
+			"
+		::= { TXpingsEntry 12 }	
+	txAPjp2  OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"TX Affected JP2 pins in decimal"
+		::= { TXpingsEntry 13 }	
+
+
+		
+RXpingsEntry	OBJECT-TYPE
+		SYNTAX SEQUENCE OF RXpingsEntry
+		ACCESS	not-accessible
+		STATUS      mandatory
+                DESCRIPTION
+			"RXpingsEntry"
+		::= { pings 2}	
+
+		RXpingsEntry::= 
+		SEQUENCE {
+			rxFreq  INTEGER (0..255),
+			rxAP 	INTEGER (0..255),
+			rxMax   INTEGER (0..255),
+			rxStatus	INTEGER {Blocked(0), InService(1), Disabled(2)},
+			rxLost	INTEGER (0..255),
+			rxCount INTEGER (0..255),
+			rxAPrelay INTEGER (0..255),
+			rxAPjp2 INTEGER (0..255)
+
+
+		}
+	rxFreq  OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"RX ping frequency"
+		::= { RXpingsEntry 1 }	
+	rxAP  OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"RX Affected pins in decimal"
+		::= { RXpingsEntry 2 }	
+	rxMAX  OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"Maximum request lost before action to be taken"
+		::= { RXpingsEntry 3 }	
+	rxStatus  OBJECT-TYPE
+		SYNTAX INTEGER {Blocked(0), InService(1), Disabled(2)}
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			"An actual status of the rxPing functionality"
+		::= { RXpingsEntry 4 }	
+	rxLost  OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			"Number of seconds non-received ICMP ECHO packets"
+		::= { RXpingsEntry 5 }	
+	rxCount  OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			"Number of actions taken after rxFreq is reached"
+		::= { RXpingsEntry 6 }	
+	rxAPrelay  OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"RX Affected RELAY pins in decimal"
+		::= { RXpingsEntry 7 }
+	rxAPjp2  OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"RX Affected JP2  pins in decimal"
+		::= { RXpingsEntry 8 }	
+	
+
+
+-- DigitalS.1._3_.X
+config  OBJECT-TYPE
+	SYNTAX      config
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+	"Basic configuration section."
+	::= {  DAEnetIP1 3 }
+
+--tftp  OBJECT-TYPE
+--	SYNTAX      config
+--	MAX-ACCESS  not-accessible
+--	STATUS      current
+--	DESCRIPTION
+--	"A list of available TFTP options."
+--	::= {  config 1 }
+
+tftpEntry	OBJECT-TYPE
+		SYNTAX SEQUENCE OF tftpEntry
+		ACCESS	not-accessible
+		STATUS      mandatory
+                DESCRIPTION
+			"tftpEntry"
+		::= { config 1}	
+
+		tftpEntry::= 
+		SEQUENCE {
+			tftpIP    IpAddress,
+			tftpFile  STRING  (0..14),
+			tftpVer   STRING  (0..64),
+			tftpConfirm   INTEGER {donot(0),confirm(1)}
+		}
+
+	tftpIP  OBJECT-TYPE
+		SYNTAX  IpAddress
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"TFTP server IP address"
+		::= { tftpEntry 1 }	
+	tftpFile   OBJECT-TYPE
+		SYNTAX 		STRING  (0..14)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"Requested file"
+		::= { tftpEntry 2 }
+	tftpVer  OBJECT-TYPE
+		SYNTAX STRING  (0..64)
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			"Current loaded firmware version"
+		::= { tftpEntry 3 }	
+	tftpConfirm  OBJECT-TYPE
+		SYNTAX INTEGER {donot(0),confirmTftpUpdate(1)}
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"start TFTP session"
+		::= { tftpEntry 4 }	
+
+snmpCfg	OBJECT-TYPE
+		SYNTAX snmpCfg
+		ACCESS	not-accessible
+		STATUS      mandatory
+                DESCRIPTION
+			"snmpCfg"
+		::= { config 2}	
+roSNMPCommunity	OBJECT-TYPE
+		SYNTAX STRING (1..14)
+		ACCESS	read-write
+		STATUS      mandatory
+                DESCRIPTION
+			"SNMP RO community string"
+		::= { snmpCfg 1}	
+rwSNMPCommunity	OBJECT-TYPE
+		SYNTAX STRING (1..14)
+		ACCESS	read-write
+		STATUS      mandatory
+                DESCRIPTION
+			"SNMP RW community string"
+		::= { snmpCfg 2}	
+SNMPaccessIP1	OBJECT-TYPE
+		SYNTAX IpAddress
+		ACCESS	read-write
+		STATUS      mandatory
+                DESCRIPTION
+			"SNMP Access IP 1"
+		::= { snmpCfg 3}	
+SNMPaccessNET1	OBJECT-TYPE
+		SYNTAX INTEGER (0..32)
+		ACCESS	read-write
+		STATUS      mandatory
+                DESCRIPTION
+			"SNMP Access net 1"
+		::= { snmpCfg 4}	
+SNMPaccessIP2	OBJECT-TYPE
+		SYNTAX IpAddress
+		ACCESS	read-write
+		STATUS      mandatory
+                DESCRIPTION
+			"SNMP Access IP 2"
+		::= { snmpCfg 5}	
+SNMPaccessNET2	OBJECT-TYPE
+		SYNTAX INTEGER (0..32)
+		ACCESS	read-write
+		STATUS      mandatory
+                DESCRIPTION
+			"SNMP Access net 2"
+		::= { snmpCfg 6}	
+SNMPtrap1	OBJECT-TYPE
+		SYNTAX IpAddress
+		ACCESS	read-write
+		STATUS      mandatory
+                DESCRIPTION
+			"SNMP TRAP IP 1"
+		::= { snmpCfg 7}	
+SNMPtrap2	OBJECT-TYPE
+		SYNTAX IpAddress
+		ACCESS	read-write
+		STATUS      mandatory
+                DESCRIPTION
+			"SNMP TRAP IP 2"
+		::= { snmpCfg 8}	
+
+adminCfg	OBJECT-TYPE
+		SYNTAX adminCfg
+		ACCESS	not-accessible
+		STATUS      mandatory
+                DESCRIPTION
+			"snmpCfg"
+		::= { config 3}	
+webUsername	OBJECT-TYPE
+		SYNTAX STRING (1..8)
+		ACCESS	read-write
+		STATUS      mandatory
+                DESCRIPTION
+			"WEB username"
+		::= { adminCfg 1}	
+webPassword	OBJECT-TYPE
+		SYNTAX STRING (1..16)
+		ACCESS	read-write
+		STATUS      mandatory
+                DESCRIPTION
+			"WEB password"
+		::= { adminCfg 2}	
+
+-- IP/VLAN/DHCP  settings
+DAEnetIP1SetupEntry	OBJECT-TYPE
+		SYNTAX SEQUENCE OF DAEnetIP1SetupEntry
+		ACCESS	not-accessible
+		STATUS      mandatory
+                DESCRIPTION
+			"DAEnetIP1Setup"
+		::= { config 4}	
+
+		DAEnetIP1SetupEntry::= 
+		SEQUENCE {
+			setupIP    IpAddress,
+			setupMask  IpAddress,
+			setupGW    IpAddress,
+			setupDHCPclient  INTEGER {disabled(0), enabled(1)},
+			setup8021Qmode    INTEGER {disabled(0), enabled(1)},
+			setup8021Qtag    INTEGER,	
+			setupFirmwareName STRING (0..14),
+			setupRestart INTEGER,
+			setupMAC STRING
+
+		}
+
+	setupIP OBJECT-TYPE
+		SYNTAX  IpAddress
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"DAEnetIP1 IPv4 Address"
+		::= { DAEnetIP1SetupEntry 1 }	
+	setupMask OBJECT-TYPE
+		SYNTAX  IpAddress
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"DAEnetIP1 IPv4 NET MASK dotted decimal"
+		::= { DAEnetIP1SetupEntry 2 }	
+	setupGW OBJECT-TYPE
+		SYNTAX  IpAddress
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"DAEnetIP1 IPv4 Default gateway"
+		::= { DAEnetIP1SetupEntry 3 }
+	setupDHCPclient  OBJECT-TYPE
+		SYNTAX INTEGER {disabled(0), enabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"DAEnetIP1 DHCP client state"
+		::= { DAEnetIP1SetupEntry 4 }	
+	setup8021Qmode  OBJECT-TYPE
+		SYNTAX INTEGER {disabled(0), enabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"DAEnetIP1 802.1Q mode"
+		::= { DAEnetIP1SetupEntry 5 }	
+	setup8021Qtag  OBJECT-TYPE
+		SYNTAX INTEGER
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"DAEnetIP1 802.1Q tag"
+		::= { DAEnetIP1SetupEntry 6 }	
+		
+	setupFirmwareName  OBJECT-TYPE
+		SYNTAX 		STRING  (0..64)
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			"DAEnetIP1 firmware version"
+		::= { DAEnetIP1SetupEntry 7 }
+	setupRestart  OBJECT-TYPE
+		SYNTAX 		INTRGER  (0..2)
+		MAX-ACCESS	write-only
+		STATUS		mandatory
+		DESCRIPTION
+			"DAEnetIP1 restart"
+		::= { DAEnetIP1SetupEntry 8 }
+	setupMAC  OBJECT-TYPE
+		SYNTAX 		STRING 
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			"DAEnetIP1 MAC address"
+		::= { DAEnetIP1SetupEntry 9 }
+	boardTemp  OBJECT-TYPE
+		SYNTAX 		STRING 
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			"DAEnetIP1 PCB temperature (C)"
+		::= { DAEnetIP1SetupEntry 10 }
+
+
+RelayEntry	OBJECT-TYPE
+		SYNTAX SEQUENCE OF RelayEntry
+		ACCESS	not-accessible
+		STATUS      mandatory
+                DESCRIPTION
+			"RelayEntry"
+		::= { DAEnetIP1 4}	
+
+		RelayEntry::= 
+		SEQUENCE {
+			RelayLock  INTEGER { High(1), Low(0) },
+			RelayState INTEGER { High(1), Low(0) },
+			RelayDelay INTEGER (0..255),
+			RelayDescription STRING (0..14)
+		}
+
+	RelayLock OBJECT-TYPE
+		SYNTAX INTEGER { High(1), Low(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"High/Low lock"
+		::= { RelayEntry 1 }	
+
+	RelayState OBJECT-TYPE
+		SYNTAX INTEGER { High(1), Low(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"High/Low state"
+		::= { RelayEntry 2 }
+
+	RelayDelay OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"Delay"
+		::= { RelayEntry 3 }	
+	RelayDescription OBJECT-TYPE
+		SYNTAX 	STRING (0..14)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Description"
+		::= { RelayEntry 4 }	
+
+ADCEntry	OBJECT-TYPE
+		SYNTAX SEQUENCE OF ADCEntry
+		ACCESS	not-accessible
+		STATUS      mandatory
+                DESCRIPTION
+			"ADCEntry"
+		::= { DAEnetIP1 5}	
+
+		ADCEntry::= 
+		SEQUENCE {
+			Value  INTEGER (0..1023),
+			SNMPRefresh INTEGER (0..255),
+			LowThreshold INTEGER (0..1023),
+			HighThreshold INTEGER (0..1023),
+			LowHysteresis INTEGER (0..255),
+			HighHysteresis INTEGER (0..255),
+			ChannelDescription STRING (0..14),
+			Mode INTEGER {Low(0), High(1), LowHigh(2), Acc(3)},
+			SNMPTrap INTEGER {no(0), yes(1)},
+			GPIOmap INTEGER {no(0), yes(1)},
+			RELAYmap INTEGER {no(0), yes(1)},
+			JP2map INTEGER {no(0), yes(1)}
+		}
+
+	Value OBJECT-TYPE
+		SYNTAX INTEGER ( 0..1023)
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			"ADC channel value"
+		::= { ADCEntry 1 }	
+
+	SNMPRefresh OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"SNMP refresh interval"
+		::= { ADCEntry 2 }
+
+	LowThreshold OBJECT-TYPE
+		SYNTAX INTEGER (0..1023)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"Low threshold value"
+		::= { ADCEntry 3 }	
+	HighThreshold OBJECT-TYPE
+		SYNTAX INTEGER (0..1023)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"High threshold value"
+		::= { ADCEntry 4 }	
+	LowHysteresis OBJECT-TYPE
+		SYNTAX INTEGER (0..1023)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"Low threshold hysteresis value"
+		::= { ADCEntry 5 }	
+	HighHysteresis OBJECT-TYPE
+		SYNTAX INTEGER (0..1023)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"High threshold hysteresis value"
+		::= { ADCEntry 6 }	
+
+
+	ChannelDescription OBJECT-TYPE
+		SYNTAX 	STRING (0..14)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Description"
+		::= { ADCEntry 7 }	
+	Mode OBJECT-TYPE
+		SYNTAX 	 INTEGER {Low(0), High(1), LowHigh(2), Acc(3)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Operating mode"
+		::= { ADCEntry 8 }	
+	SNMPTrap OBJECT-TYPE
+		SYNTAX 	INTEGER {no(0), yes(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Send SNMP trap on event"
+		::= { ADCEntry 9 }	
+	GPIOmap OBJECT-TYPE
+		SYNTAX INTEGER {no(0), yes(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Map channel to P6 GPIO"
+		::= { ADCEntry 10 }	
+	RELAYmap OBJECT-TYPE
+		SYNTAX INTEGER {no(0), yes(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Map channel to RELAY"
+		::= { ADCEntry 11 }
+	JP2map OBJECT-TYPE
+		SYNTAX INTEGER {no(0), yes(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Map channel to JP2"
+		::= { ADCEntry 12 }	
+	
+
+JP2Entry	OBJECT-TYPE
+		SYNTAX SEQUENCE OF JP2Entry
+		ACCESS	not-accessible
+		STATUS      mandatory
+                DESCRIPTION
+			"JP2Entry"
+		::= { DAEnetIP1 6}	
+
+		JP2Entry::= 
+		SEQUENCE {
+			JP2Lock  INTEGER { High(1), Low(0) },
+			JP2State INTEGER { High(1), Low(0) },
+			JP2Delay INTEGER (0..255),
+			JP2Description STRING (0..14),
+			JP2Value INTEGER {High(1), Low(0)}	
+		}
+
+	JP2Lock OBJECT-TYPE
+		SYNTAX INTEGER { High(1), Low(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"High/Low lock"
+		::= { JP2Entry 1 }	
+
+	JP2State OBJECT-TYPE
+		SYNTAX INTEGER { High(1), Low(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"High/Low state"
+		::= { JP2Entry 2 }
+
+	JP2Delay OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"Delay"
+		::= { JP2Entry 3 }	
+	JP2Description OBJECT-TYPE
+		SYNTAX 	STRING (0..14)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Description"
+		::= { JP2Entry 4 }	
+	JP2Value OBJECT-TYPE
+		SYNTAX INTEGER { High(1), Low(0) }
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			"High/Low value"
+		::= { JP2Entry 5 }
+
+
+-- DI-09H entry
+
+SwitchMain	OBJECT-TYPE
+		SYNTAX SEQUENCE OF SwitchMain
+		ACCESS	not-accessible
+		STATUS      mandatory
+                DESCRIPTION
+			"SwitchMain"
+		::= { DI-09H 1}	
+
+		SwitchMain::= 
+		SEQUENCE {
+			SwitchAccessMode  INTEGER { Access(1), Blocked(0) },
+			SwitchControlMode  INTEGER { Buffered(1), Continuous(0) },
+			Read INTEGER {Read(1), Passive(0)},
+			Write INTEGER {Write(1), Passive(0)},
+			Restart INTEGER {Write(1), Passive(0)}
+
+		}
+
+	SwitchAccessMode OBJECT-TYPE
+		SYNTAX INTEGER { Access(1), Blocked(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"1 - Switch uses the EEPROM
+			 0 - Switch do not uses EEPROM "
+		::= { SwitchMain 1 }	
+
+	SwitchControlMode OBJECT-TYPE
+		SYNTAX INTEGER { Buffered(1), Continuous(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"1 - Buffered operation
+			 0 - Continuous operation"
+		::= { SwitchMain 2 }
+
+	Read	 OBJECT-TYPE
+		SYNTAX INTEGER {Read(1), Passive(0)}
+		MAX-ACCESS	write-only
+		STATUS		mandatory
+		DESCRIPTION
+			"Read switch config"
+		::= { SwitchMain 3 }	
+	Write OBJECT-TYPE
+		SYNTAX 	INTEGER { Write(1), Passive(0)}
+		MAX-ACCESS	write-only
+		STATUS		mandatory
+		DESCRIPTION
+			"Write switch config"
+		::= { SwitchMain 4 }	
+	Restart OBJECT-TYPE
+		SYNTAX 	INTEGER { Restart(1), Passive(0)}
+		MAX-ACCESS	write-only
+		STATUS		mandatory
+		DESCRIPTION
+			"Restart Switch"
+		::= { SwitchMain 5 }	
+	SAPfilename OBJECT-TYPE
+		SYNTAX 	STRING (0..14)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"AP filename"
+		::= { SwitchMain 6 } 	
+	TFTPserver OBJECT-TYPE
+		SYNTAX  IpAddress
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"AP TFTP server IP"
+		::= { SwitchMain 7 } 	
+	GetInterval OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"AP TFTP get interval sec."
+		::= { SwitchMain 8 } 	
+	GetNow OBJECT-TYPE
+		SYNTAX  INTEGER {Get(1), Forget(0)}
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"get now"
+		::= { SwitchMain 9 } 	
+	PutNow OBJECT-TYPE
+		SYNTAX  INTEGER {Put(1), DoNotPut(0)}
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"put now"
+		::= { SwitchMain 10 } 	
+
+SwitchSettings	OBJECT-TYPE
+		SYNTAX SEQUENCE OF SwitchSettings
+		ACCESS	not-accessible
+		STATUS      mandatory
+                DESCRIPTION
+			"SwitchSettings"
+		::= { DI-09H 2}	
+
+		SwitchSettings::= 
+		SEQUENCE {
+			FilterBad  INTEGER { True(1), False(0) },
+			TXfc  INTEGER { Enable(1), Disable(0) },
+			RXfc INTEGER {Enable(1), Disable(0)},
+			BCastDROP INTEGER {Input(1), Output(0)},
+			Aging INTEGER {Enable(1), Disable(0)},
+			FastAging INTEGER {Enable(1), Disable(0)},
+			Trunking INTEGER {0_1(1), 6_7(0)},
+			WRR INTEGER {Enable(1), Disable(0)},
+			LoopDetection INTEGER {16_1(3), High(2), 8_1(1), 4_1(0)},
+			BasePrio INTEGER (0..7)
+		}
+
+	FilterBad OBJECT-TYPE
+		SYNTAX INTEGER { True(1), False(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"1 - Filter packets fith bad checksum
+			 0 - Pass all"
+		::= { SwitchSettings 1 }	
+	TXfc OBJECT-TYPE
+		SYNTAX INTEGER { Enable(1), Disable(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"1 - Enable
+			 0 - Disable"
+		::= { SwitchSettings 2 }	
+	RXfc OBJECT-TYPE
+		SYNTAX INTEGER { Enable(1), Disable(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"1 - Enable
+			 0 - Disable"
+		::= { SwitchSettings 3 }	
+	BCastDROP OBJECT-TYPE
+		SYNTAX INTEGER { Input(1), Output(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"1 - Input 
+			 0 - Output"
+		::= { SwitchSettings 4 }	
+	Aging OBJECT-TYPE
+		SYNTAX INTEGER { Enable(1), Disable(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"1 - Enable 
+			 0 - Disable"
+		::= { SwitchSettings 5 }	
+	FastAging OBJECT-TYPE
+		SYNTAX INTEGER { Enable(1), Disable(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"1 - Enable 
+			 0 - Disable"
+		::= { SwitchSettings 6 }	
+	FastAging OBJECT-TYPE
+		SYNTAX INTEGER { Enable(1), Disable(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"1 - Enable 
+			 0 - Disable"
+		::= { SwitchSettings 6 }	
+	Trunking OBJECT-TYPE
+		SYNTAX INTEGER { p0a1(1), p6a7(0)}
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"1 - port 0 & 1 
+			 0 - port 6 & 7"
+		::= { SwitchSettings 7 }	
+	WRR OBJECT-TYPE
+		SYNTAX INTEGER { 16a1(3), High(2), 8a1(1), 4a1(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			" High yo low queue ratio"
+		::= { SwitchSettings 8 }	
+	LoopDetection OBJECT-TYPE
+		SYNTAX INTEGER { Disable(1), Enable(0)}
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"Loop detection"
+		::= { SwitchSettings 9 }	
+	BasePrio OBJECT-TYPE
+		SYNTAX INTEGER (0..7)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"high/low queue delim"
+		::= { SwitchSettings 10 }	
+
+SwitchPrio	OBJECT-TYPE
+		SYNTAX SEQUENCE OF SwitchPrio
+		ACCESS	not-accessible
+		STATUS      mandatory
+                DESCRIPTION
+			"Switch Prio settings"
+		::= { DI-09H 3}	
+
+		SwitchPrio::= 
+		SEQUENCE {
+			IPAprio  INTEGER { High(1), Low(0) },
+			IPBprio  INTEGER { High(1), Low(0) },
+			IPA IpAddress,
+			IPB IpAddress,
+			IpAMask IpAddress,
+			IpBMask IpAddress,
+			DSCPAvalue INTEGER (0..63),
+			DSCPBvalue INTEGER (0..63),
+			DSCPAprio  INTEGER { High(1), Low(0) },
+			DSCPBprio  INTEGER { High(1), Low(0) },
+			DSCPDefault  INTEGER { High(1), Low(0) }
+		}
+
+	IPAprio OBJECT-TYPE
+		SYNTAX INTEGER { High(1), Low(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"1 - High
+			 0 - Low"
+		::= { SwitchPrio 1 }	
+	IPBprio OBJECT-TYPE
+		SYNTAX INTEGER { High(1), Low(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			"1 - High
+			 0 - Low"
+		::= { SwitchPrio 2 }	
+	IPA OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPrio 3 }	
+	IPB OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPrio 4 }	
+	IpAMask OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPrio 5 }	
+	IpBMask OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPrio 6 }	
+	DSCPAvalue OBJECT-TYPE
+		SYNTAX INTEGER (0..63)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPrio 7 }	
+	DSCPBvalue OBJECT-TYPE
+		SYNTAX INTEGER (0..63)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPrio 8 }	
+	DSCPAprio OBJECT-TYPE
+		SYNTAX INTEGER { High(1), Low(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPrio 9 }	
+	DSCPBprio OBJECT-TYPE
+		SYNTAX INTEGER { High(1), Low(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPrio 10 }	
+	DSCPDeafult OBJECT-TYPE
+		SYNTAX INTEGER { High(1), Low(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPrio 11 }	
+
+SwitchVlanGeneral	OBJECT-TYPE
+		SYNTAX SEQUENCE OF SwitchVlanGeneral
+		ACCESS	not-accessible
+		STATUS      mandatory
+                DESCRIPTION
+			"SwitchVlanGeneral"
+		::= { DI-09H 4}	
+
+		SwitchVlanGeneral::= 
+		SEQUENCE {
+			VLANenable  INTEGER { Disable(1), Enable(0) },
+			TAGAware  INTEGER { Disable(1), Enable(0) },
+			IngressFiltering  INTEGER { Disable(1), Enable(0) },
+			TagAdmit  INTEGER { Disable(1), Enable(0) }
+		}
+
+	VLANenable OBJECT-TYPE
+		SYNTAX INTEGER { Disable(1), Enable(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchVlanGeneral 1 }	
+	 TAGAware OBJECT-TYPE
+		SYNTAX INTEGER { Disable(1), Enable(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchVlanGeneral 2 }	
+	 IngressFiltering OBJECT-TYPE
+		SYNTAX INTEGER { Disable(1), Enable(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchVlanGeneral 3 }	
+	 TagAdmit OBJECT-TYPE
+		SYNTAX INTEGER { Disable(1), Enable(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchVlanGeneral 4 }	
+
+SwitchPPconfig	OBJECT-TYPE
+		SYNTAX SEQUENCE OF SwitchPPconfig
+		ACCESS	not-accessible
+		STATUS      mandatory
+                DESCRIPTION
+			"SwitchPPconfig"
+		::= { DI-09H 5}	
+
+		SwitchPPconfig::= 
+		SEQUENCE {
+			VLANID  INTEGER (0..15),
+			PortVLANAction  INTEGER (0..3),
+			NULLVIDReplace  INTEGER { Replace(1), Keep(0) },
+			NonPVIDpackets  INTEGER { Drop(1), Pass(0) },
+			8021pPrio INTEGER {enable(1), disable(0)},
+			DSCPPrio INTEGER {enable(1), disable(0)},
+			PortPrio INTEGER {enable(1), disable(0)},
+			PortTX INTEGER {enable(1), disable(0)},
+			PortRX INTEGER {enable(1), disable(0)},
+			PortLearning INTEGER {enable(1), disable(0)},
+			Link INTEGER {Up(1), Down(0)},
+			Speed INTEGER {TX10 (0), TX100 (1)},
+			Duplex INTEGER {Half(0), Full(1)}, 
+			RemoteFault INTEGER {No (0), Yes (1)},
+			AutoNegotiation INTEGER { Incomplete(0), Complete(1)},
+			LinkQuality INTEGER (0..15),
+			LoopDetected INTEGER {No(0), Yes(1)},
+			PortSettings INTEGER {10H(0), 10F(1), 100H(2), 100F(3)}
+		}
+
+	VLANID OBJECT-TYPE
+		SYNTAX INTEGER (0..15)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPPconfig 1 }	
+
+	PortVLANAction OBJECT-TYPE
+		SYNTAX INTEGER (0..3)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPPconfig 2 }	
+	NULLVIDReplace OBJECT-TYPE
+		SYNTAX INTEGER { Replace(1), Keep(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPPconfig 3 }	
+	NonPVIDpackets OBJECT-TYPE
+		SYNTAX INTEGER  { Drop(1), Pass(0) }
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPPconfig 4 }	
+	8021pPrio OBJECT-TYPE
+		SYNTAX INTEGER  {enable(1), disable(0)}
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPPconfig 5 }	
+	DSCPPrio OBJECT-TYPE
+		SYNTAX INTEGER  {enable(1), disable(0)}
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPPconfig 6 }	
+	PortPrio OBJECT-TYPE
+		SYNTAX INTEGER  {enable(1), disable(0)}
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPPconfig 7 }	
+	PortTX OBJECT-TYPE
+		SYNTAX INTEGER  {enable(1), disable(0)}
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPPconfig 8 }
+	PortRX OBJECT-TYPE
+		SYNTAX INTEGER  {enable(1), disable(0)}
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPPconfig 9 }	
+	PortLearning OBJECT-TYPE	
+		SYNTAX INTEGER  {enable(1), disable(0)}
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPPconfig 10 }	
+	Link OBJECT-TYPE	
+		SYNTAX INTEGER  {Up(1), down(0)}
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPPconfig 11 }	
+	Speed OBJECT-TYPE	
+		SYNTAX INTEGER  {TX10 (0), TX100 (1)}
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPPconfig 12 }	
+	Duplex OBJECT-TYPE	
+		SYNTAX INTEGER  {Half(0), Full(1)}
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPPconfig 13 }	
+	RemoteFault OBJECT-TYPE	
+		SYNTAX INTEGER  {No (0), Yes (1)}
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPPconfig 14 }	
+	AutoNegotiation OBJECT-TYPE	
+		SYNTAX INTEGER  {Incomplete(0), Complete(1)}
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPPconfig 15 }	
+	LinkQuality OBJECT-TYPE	
+		SYNTAX INTEGER  (0..15)
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPPconfig 16 }	
+	LoopDetected OBJECT-TYPE	
+		SYNTAX INTEGER  {No(0), Yes(1)}
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPPconfig 17 }	
+	 PortSettings OBJECT-TYPE	
+		SYNTAX INTEGER  {10H(0), 10F(1), 100H(2), 100F(3)}
+		MAX-ACCESS	read-only
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { SwitchPPconfig 18 }	
+
+
+VGroupsConfig	OBJECT-TYPE
+		SYNTAX SEQUENCE OF VGroupsConfig
+		ACCESS	not-accessible
+		STATUS      mandatory
+                DESCRIPTION
+			"VGroupsConfig"
+		::= { DI-09H 6}	
+
+		VGroupsConfig::= 
+		SEQUENCE {
+			VLANIDmembership  INTEGER (0..255),
+			8021Qtag  INTEGER (0..4095),
+		}
+
+	VLANIDmembership OBJECT-TYPE
+		SYNTAX INTEGER (0..255)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { VGroupsConfig 1 }	
+	8021Qtag OBJECT-TYPE
+		SYNTAX INTEGER (0..4095)
+		MAX-ACCESS	read-write
+		STATUS		mandatory
+		DESCRIPTION
+			""
+		::= { VGroupsConfig 2 }	
+	
+END					
