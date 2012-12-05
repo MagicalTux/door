@@ -15,12 +15,14 @@ public slots:
 	void open(); // open door
 	void open_tmp(); // open door for 10 secs
 	void open_end(); // end opening (automatically called by open())
+	void setOpen(bool);
 
 private:
 	QString open1, open2, close1, close2;
 	QString closed_sensor, unlocked_sensor, locked_sensor;
 	bool autolock;
 	bool in_action, tmp_open;
+	bool force_open;
 
 	QTimer timer_check;
 

@@ -35,6 +35,18 @@ QByteArray DoorServer::handle(const QByteArray &req) {
 		doors.value(door)->open_tmp();
 		return "ok";
 	}
+	if (l.at(0) == "open") {
+		QString door = QString::fromUtf8(l.at(1));
+		if (!doors.contains(door)) return "error";
+		doors.value(door)->setOpen(true);
+		return "ok";
+	}
+	if (l.at(0) == "close") {
+		QString door = QString::fromUtf8(l.at(1));
+		if (!doors.contains(door)) return "error";
+		doors.value(door)->setOpen(false);
+		return "ok";
+	}
 	return "error";
 }
 

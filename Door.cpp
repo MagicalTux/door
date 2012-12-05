@@ -36,9 +36,13 @@ void Door::doCheck() {
 		return; // skip tests if door is open
 	}
 
-	if ((!autolock) && (!tmp_open)) {
+	if ((!autolock) && (!tmp_open) && (!force_open)) {
 		if (snmp.get(unlocked_sensor).toInt())
 			close();
+	}
+	if (force_open) {
+		if (snmp.get(locked_sensor).toInt())
+			open();
 	}
 }
 
@@ -83,5 +87,11 @@ void Door::open_end() {
 	in_action = false;
 	snmp.set(open1, 1);
 	snmp.set(open2, 1);
+}
+
+void Door::setOpen(bool op) {
+	force_open = op;
+	if (op)
+		open();
 }
 
