@@ -48,11 +48,11 @@ void Door::doCheck() {
 
 void Door::close() {
 	if (in_action) return;
+	tmp_open = false;
 	if (autolock) {
 		open_end();
 		return;
 	}
-	tmp_open = false;
 	if (!snmp.get(closed_sensor).toInt()) return; // can't close
 	snmp.set(close1, 0);
 	snmp.set(close2, 0);
