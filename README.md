@@ -12,5 +12,5 @@ To set the trap server IP, run:
 
 	snmpset -v1 -c private 192.168.0.100 DenkoviMIB::SNMPtrap1 a 192.168.0.88
 
-You'll need to modify the snmptrapd commandline to add `-m DenkoviMIB,DISMAN-EVENT-MIB,SNMPv2-MIB`
+You'll need to modify the snmptrapd commandline to add `-m DenkoviMIB:DISMAN-EVENT-MIB:SNMPv2-MIB`
 
