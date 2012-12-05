@@ -72,7 +72,6 @@ void Door::open() {
 	if (autolock) {
 		snmp.set(open1, 0);
 		snmp.set(open2, 0);
-		in_action = true;
 		return;
 	}
 	snmp.set(open1, 0);
