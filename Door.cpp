@@ -100,6 +100,7 @@ void Door::setOpen(bool op) {
 }
 
 bool Door::getOpen() {
+	if (tmp_open) return true;
 	return force_open;
 }
 
