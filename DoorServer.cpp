@@ -27,7 +27,17 @@ void DoorServer::readSocket() {
 QByteArray DoorServer::handle(const QByteArray &req) {
 	QList<QByteArray> l = req.split('|');
 	if (l.at(0) == "list") {
-		return QStringList(doors.keys()).join("|").toUtf8();
+		QStringList res;
+		for(QMap<QString,Door*>::iterator i = doors.begin(); i != doors.end(); i++) {
+			QString tmp = i.key() + "=";
+			if (i.value()->getOpen()) {
+				tmp += "open";
+			} else {
+				tmp += "closed";
+			}
+			res.append(tmp);
+		}
+		return res.join("|").toUtf8();
 	}
 	if (l.at(0) == "open_tmp") {
 		QString door = QString::fromUtf8(l.at(1));

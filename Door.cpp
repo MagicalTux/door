@@ -36,7 +36,7 @@ void Door::doCheck() {
 		return; // skip tests if door is open
 	}
 
-	if ((!autolock) && (!tmp_open) && (!force_open)) {
+	if ((!tmp_open) && (!force_open)) {
 		if (snmp.get(unlocked_sensor).toInt())
 			close();
 	}
@@ -47,6 +47,11 @@ void Door::doCheck() {
 }
 
 void Door::close() {
+	if (in_action) return;
+	if (autolock) {
+		open_end();
+		return;
+	}
 	tmp_open = false;
 	if (!snmp.get(closed_sensor).toInt()) return; // can't close
 	snmp.set(close1, 0);
@@ -63,11 +68,11 @@ void Door::close_end() {
 }
 
 void Door::open() {
+	if (in_action) return;
 	if (autolock) {
 		snmp.set(open1, 0);
 		snmp.set(open2, 0);
 		in_action = true;
-		QTimer::singleShot(15000, this, SLOT(open_end()));
 		return;
 	}
 	snmp.set(open1, 0);
@@ -78,7 +83,6 @@ void Door::open() {
 
 void Door::open_tmp() {
 	open();
-	if (autolock) return;
 	tmp_open = true;
 	QTimer::singleShot(10000, this, SLOT(close()));
 }
@@ -93,5 +97,9 @@ void Door::setOpen(bool op) {
 	force_open = op;
 	if (op)
 		open();
+}
+
+bool Door::getOpen() {
+	return force_open;
 }
 
